@@ -40,9 +40,35 @@ export async function signUp(formData: FormData): Promise<ActionResult> {
   const lastName = lastParts.join(' ') || '';
   const loginId = email; // Admin's loginId = their email
 
+  // Generate base 2-letter code
+  const words = companyName.trim().split(/\s+/);
+  let baseCode = '';
+  if (words.length >= 2) {
+    baseCode = (words[0][0] + words[1][0]).toUpperCase();
+  } else {
+    baseCode = companyName.length >= 2 ? companyName.substring(0, 2).toUpperCase() : companyName.padEnd(2, 'X').toUpperCase();
+  }
+
+  let code = baseCode;
+  let counter = 0;
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  // Ensure uniqueness
+  while (true) {
+    const existingCompany = await prisma.company.findUnique({ where: { code } });
+    if (!existingCompany) break;
+    
+    code = baseCode[0] + chars[counter % chars.length];
+    counter++;
+    if (counter > chars.length * 2) {
+       code = chars[Math.floor(Math.random() * 26)] + chars[Math.floor(Math.random() * 26)];
+    }
+  }
+
   const company = await prisma.company.create({
     data: {
       name: companyName,
+      code,
       users: {
         create: {
           loginId,

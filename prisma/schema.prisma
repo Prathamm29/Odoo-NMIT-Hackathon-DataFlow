@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -33,10 +34,12 @@ enum LeaveStatus {
 }
 
 model Company {
-  id      String  @id @default(cuid())
-  name    String
-  logoUrl String?
-  users   User[]
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique @db.VarChar(2)
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  users     User[]
 }
 
 model User {
@@ -59,6 +62,9 @@ model EmployeeProfile {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   firstName       String
   lastName        String
+  phone           String?
+  address         String?
+  avatarUrl       String?
   jobTitle        String?
   department      String?
   dateOfJoining   DateTime

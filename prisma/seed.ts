@@ -15,9 +15,9 @@ async function main() {
 
   // ── Create Company ───────────────────────────────────────────────────────
   const company = await prisma.company.create({
-    data: { name: 'Dayflow Inc.' },
+    data: { name: 'Dayflow Inc.', code: 'OI' },
   });
-  console.log(`✅ Created company: ${company.name}`);
+  console.log(`✅ Created company: ${company.name} (${company.code})`);
 
   // ── Create Admin ─────────────────────────────────────────────────────────
   const adminPasswordHash = await bcrypt.hash('admin123', 12);

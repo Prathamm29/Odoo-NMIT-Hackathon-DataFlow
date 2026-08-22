@@ -16,13 +16,29 @@ function generateTempPassword(): string {
   return password;
 }
 
-// ─── Helper: Generate a loginId from name ────────────────────────────────────
-
-function generateLoginId(firstName: string, lastName: string, companyName: string): string {
-  const base = `${firstName.toLowerCase()}.${lastName.toLowerCase()}`;
-  const suffix = companyName.substring(0, 3).toLowerCase();
-  const rand = Math.floor(Math.random() * 100);
-  return `${base}.${suffix}${rand}`;
+async function generateEmployeeLoginId(companyId: string, companyCode: string, firstName: string, lastName: string, joinDate: Date): Promise<string> {
+  const padStr = (str: string) => (str.length >= 2 ? str.substring(0, 2) : str.padEnd(2, 'X')).toUpperCase();
+  
+  const nameCode = padStr(firstName) + padStr(lastName);
+  const year = joinDate.getFullYear().toString();
+  
+  const startOfYear = new Date(`${year}-01-01T00:00:00.000Z`);
+  const endOfYear = new Date(`${year}-12-31T23:59:59.999Z`);
+  
+  const count = await prisma.user.count({
+    where: {
+      companyId,
+      profile: {
+        dateOfJoining: {
+          gte: startOfYear,
+          lte: endOfYear
+        }
+      }
+    }
+  });
+  
+  const serial = (count + 1).toString().padStart(4, '0');
+  return `${companyCode}${nameCode}${year}${serial}`;
 }
 
 // ─── Add Employee (Admin-only) ───────────────────────────────────────────────
@@ -50,14 +66,19 @@ export async function addEmployee(formData: FormData): Promise<AddEmployeeResult
     return { success: false, error: 'An employee with this email already exists.' };
   }
 
-  // Fetch company name for loginId generation
+  // Fetch company code for loginId generation
   const company = await prisma.company.findUnique({
     where: { id: session.companyId },
   });
 
+  if (!company) {
+    return { success: false, error: 'Company not found.' };
+  }
+
   const tempPassword = generateTempPassword();
   const passwordHash = await bcrypt.hash(tempPassword, 12);
-  const loginId = generateLoginId(firstName, lastName, company?.name ?? 'co');
+  const dateOfJoining = new Date();
+  const loginId = await generateEmployeeLoginId(session.companyId, company.code, firstName, lastName, dateOfJoining);
 
   await prisma.user.create({
     data: {
@@ -73,7 +94,7 @@ export async function addEmployee(formData: FormData): Promise<AddEmployeeResult
           lastName,
           jobTitle,
           department,
-          dateOfJoining: new Date(),
+          dateOfJoining,
           baseMonthlyWage,
         },
       },
