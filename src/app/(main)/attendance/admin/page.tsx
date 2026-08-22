@@ -1,16 +1,32 @@
-"use client";
+import { getAllAttendance } from "@/actions/attendance.actions";
+import AttendanceDateFilter from "@/components/attendance/AttendanceDateFilter";
+import Link from "next/link";
 
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+export default async function AdminAttendancePage({
+  searchParams,
+}: {
+  searchParams: { date?: string };
+}) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const targetDate = searchParams.date || todayStr;
+  
+  const result = await getAllAttendance(targetDate);
+  const records = result.success && result.data ? result.data : [];
 
-const MOCK_DATA = [
-  { id: 1, name: "Alice Johnson", date: "2023-10-25", checkIn: "08:55 AM", checkOut: "05:05 PM", workHours: "8h 10m", extraHours: "10m" },
-  { id: 2, name: "Bob Smith", date: "2023-10-25", checkIn: "09:15 AM", checkOut: "06:30 PM", workHours: "9h 15m", extraHours: "1h 15m" },
-  { id: 3, name: "Charlie Davis", date: "2023-10-25", checkIn: "08:45 AM", checkOut: "04:45 PM", workHours: "8h 0m", extraHours: "0m" },
-  { id: 4, name: "Diana Prince", date: "2023-10-25", checkIn: "09:00 AM", checkOut: "05:15 PM", workHours: "8h 15m", extraHours: "15m" },
-  { id: 5, name: "Alice Johnson", date: "2023-10-24", checkIn: "08:50 AM", checkOut: "05:00 PM", workHours: "8h 10m", extraHours: "10m" },
-];
+  // Format date helper
+  const formatDate = (isoString: string) => {
+    return new Date(isoString).toLocaleDateString("en-US", {
+      year: "numeric", month: "short", day: "numeric"
+    });
+  };
 
-export default function AdminAttendancePage() {
+  const formatTime = (isoString: string | null) => {
+    if (!isoString) return "-";
+    return new Date(isoString).toLocaleTimeString("en-US", {
+      hour: "2-digit", minute: "2-digit"
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -19,17 +35,14 @@ export default function AdminAttendancePage() {
           <p className="text-gray-600 mt-1">Monitor company-wide employee attendance records.</p>
         </div>
         
-        <div className="relative w-full sm:w-72">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-          </div>
-          <input 
-            type="date" 
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" 
-            defaultValue="2023-10-25"
-          />
-        </div>
+        <AttendanceDateFilter defaultDate={todayStr} />
       </div>
+
+      {!result.success && (
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-sm">
+          {result.error}
+        </div>
+      )}
 
       <div className="bg-white border border-gray-300 overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -37,6 +50,7 @@ export default function AdminAttendancePage() {
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Employee Name</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Date</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Status</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Check In</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Check Out</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Work Hours</th>
@@ -44,16 +58,38 @@ export default function AdminAttendancePage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {MOCK_DATA.map((row) => (
+            {records.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{row.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.date}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.checkIn}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.checkOut}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">{row.workHours}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-green-700 font-medium">{row.extraHours}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                  <Link href={`/profile/${row.userId}`} className="hover:underline text-blue-600">
+                    {row.employeeName}
+                  </Link>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatDate(row.date)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <span className={`px-2 py-1 text-xs font-bold ${
+                    row.status === 'PRESENT' ? 'bg-green-100 text-green-800' :
+                    row.status === 'ABSENT' ? 'bg-red-100 text-red-800' :
+                    row.status === 'LEAVE' ? 'bg-blue-100 text-blue-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {row.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatTime(row.checkIn)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatTime(row.checkOut)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">{row.workHours ? `${row.workHours}h` : '-'}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-green-700 font-medium">{row.extraHours ? `${row.extraHours}h` : '-'}</td>
               </tr>
             ))}
+
+            {records.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-6 py-12 text-center text-sm text-gray-500">
+                  No attendance records found for this date.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

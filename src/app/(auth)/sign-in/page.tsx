@@ -3,24 +3,57 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn, changePassword } from "@/actions/auth.actions";
 
 export default function SignInPage() {
   const router = useRouter();
   const [needsReset, setNeedsReset] = useState(false);
-  const [password, setPassword] = useState("password123");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password === "system-generated") {
+    setIsLoading(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const result = await signIn(formData);
+
+    if (!result.success) {
+      setError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
+    if (result.data?.mustChangePassword && result.data.userId) {
+      setUserId(result.data.userId);
       setNeedsReset(true);
+      setIsLoading(false);
     } else {
+      // The server action already redirects, but if it doesn't:
       router.push("/dashboard");
     }
   };
 
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push("/dashboard");
+    setIsLoading(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    if (userId) {
+      formData.append("userId", userId);
+    }
+    
+    const result = await changePassword(formData);
+
+    if (!result.success) {
+      setError(result.error);
+      setIsLoading(false);
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   if (needsReset) {
@@ -30,26 +63,21 @@ export default function SignInPage() {
           <h1 className="text-2xl font-bold text-gray-900">DAYFLOW</h1>
           <p className="text-gray-600 mt-2">Set your new password</p>
         </div>
-  
-        <form onSubmit={handleResetPassword} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Current Password
-            </label>
-            <input 
-              type="password" 
-              readOnly
-              value={password}
-              className="w-full border border-gray-300 bg-gray-50 px-4 py-2 text-gray-500 focus:outline-none" 
-            />
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">
+            {error}
           </div>
-  
+        )}
+
+        <form onSubmit={handleResetPassword} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">
               New Password
             </label>
             <input 
               type="password" 
+              name="newPassword"
               required 
               className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" 
             />
@@ -61,6 +89,7 @@ export default function SignInPage() {
             </label>
             <input 
               type="password" 
+              name="confirmNewPassword"
               required 
               className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" 
             />
@@ -68,9 +97,10 @@ export default function SignInPage() {
   
           <button 
             type="submit" 
-            className="w-full bg-gray-900 text-white font-bold py-3 hover:bg-gray-800"
+            disabled={isLoading}
+            className="w-full bg-gray-900 text-white font-bold py-3 hover:bg-gray-800 disabled:opacity-70"
           >
-            Set Password &amp; Continue
+            {isLoading ? "Updating..." : "Set Password & Continue"}
           </button>
         </form>
       </div>
@@ -84,6 +114,12 @@ export default function SignInPage() {
         <p className="text-gray-600 mt-2">Sign in to your account</p>
       </div>
 
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSignIn} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -91,8 +127,9 @@ export default function SignInPage() {
           </label>
           <input 
             type="text" 
+            name="identifier"
             required 
-            defaultValue="janedoe@example.com"
+            placeholder="admin@dayflow.com"
             className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" 
           />
         </div>
@@ -102,22 +139,22 @@ export default function SignInPage() {
             <label className="block text-sm font-medium text-gray-900">
               Password
             </label>
-            <span className="text-xs text-gray-500">(Type "system-generated" to demo reset)</span>
           </div>
           <input 
             type="password" 
+            name="password"
             required 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
             className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" 
           />
         </div>
 
         <button 
           type="submit" 
-          className="w-full bg-gray-900 text-white font-bold py-3 hover:bg-gray-800"
+          disabled={isLoading}
+          className="w-full bg-gray-900 text-white font-bold py-3 hover:bg-gray-800 disabled:opacity-70"
         >
-          Sign In
+          {isLoading ? "Signing in..." : "Sign In"}
         </button>
       </form>
 

@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  LEAVE
+}
+
+enum LeaveType {
+  PAID
+  SICK
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Company {
+  id      String  @id @default(cuid())
+  name    String
+  logoUrl String?
+  users   User[]
+}
+
+model User {
+  id                 String           @id @default(cuid())
+  loginId            String           @unique
+  email              String           @unique
+  passwordHash       String
+  role               Role             @default(EMPLOYEE)
+  mustChangePassword Boolean          @default(true)
+  companyId          String
+  company            Company          @relation(fields: [companyId], references: [id])
+  profile            EmployeeProfile?
+  attendances        Attendance[]
+  leaveRequests      LeaveRequest[]
+}
+
+model EmployeeProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String
+  lastName        String
+  jobTitle        String?
+  department      String?
+  dateOfJoining   DateTime
+  baseMonthlyWage Float    @default(0.0)
+}
+
+model Attendance {
+  id         String           @id @default(cuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime         @db.Date
+  checkIn    DateTime?
+  checkOut   DateTime?
+  workHours  Float?
+  extraHours Float?
+  status     AttendanceStatus @default(PRESENT)
+
+  @@unique([userId, date])
+}
+
+model LeaveRequest {
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leaveType      LeaveType
+  startDate      DateTime    @db.Date
+  endDate        DateTime    @db.Date
+  allocationDays Float
+  status         LeaveStatus @default(PENDING)
+  attachmentUrl  String?
+  remarks        String?
+}
