@@ -13,7 +13,7 @@ export default function ProfileTabs({ profile }: { profile: EmployeeProfileDTO }
     { id: "security", label: "Security" },
   ];
 
-  // Dummy salary breakdown for demo
+  
   const monthlyWage = profile.baseMonthlyWage;
   const yearlyWage = monthlyWage * 12;
   const basicSalary = monthlyWage * 0.6;

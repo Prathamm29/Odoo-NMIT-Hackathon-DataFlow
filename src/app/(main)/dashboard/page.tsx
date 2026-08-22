@@ -8,7 +8,7 @@ export default async function DashboardPage() {
   const session = await getCurrentSession();
   
   if (!session) {
-    return null; // Handled by layout redirect
+    return null; 
   }
 
   if (session.role === "ADMIN") {

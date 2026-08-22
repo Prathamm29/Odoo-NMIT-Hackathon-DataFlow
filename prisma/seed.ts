@@ -6,20 +6,20 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // ── Clean existing data ──────────────────────────────────────────────────
+  
   await prisma.leaveRequest.deleteMany();
   await prisma.attendance.deleteMany();
   await prisma.employeeProfile.deleteMany();
   await prisma.user.deleteMany();
   await prisma.company.deleteMany();
 
-  // ── Create Company ───────────────────────────────────────────────────────
+  
   const company = await prisma.company.create({
     data: { name: 'Dayflow Inc.', code: 'OI' },
   });
   console.log(`✅ Created company: ${company.name} (${company.code})`);
 
-  // ── Create Admin ─────────────────────────────────────────────────────────
+  
   const adminPasswordHash = await bcrypt.hash('admin123', 12);
   const admin = await prisma.user.create({
     data: {
@@ -43,7 +43,7 @@ async function main() {
   });
   console.log(`✅ Created admin: ${admin.email} (password: admin123)`);
 
-  // ── Create Employees ─────────────────────────────────────────────────────
+  
   const employeePassword = await bcrypt.hash('changeme', 12);
   const employees = [
     { loginId: 'alice.j', email: 'alice@dayflow.com', firstName: 'Alice', lastName: 'Johnson', jobTitle: 'Software Engineer', department: 'Engineering', wage: 7500 },
@@ -83,7 +83,7 @@ async function main() {
     console.log(`✅ Created employee: ${emp.email} (password: changeme)`);
   }
 
-  // ── Seed Attendance Data ─────────────────────────────────────────────────
+  
   const today = new Date();
   const allUserIds = [admin.id, ...createdUsers.map((u) => u.id)];
 
@@ -91,12 +91,12 @@ async function main() {
     const date = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - dayOffset));
 
     for (const userId of allUserIds) {
-      // Skip some days randomly to simulate absences
+      
       if (Math.random() < 0.15) continue;
 
-      const checkInHour = 8 + Math.floor(Math.random() * 2); // 8-9 AM
+      const checkInHour = 8 + Math.floor(Math.random() * 2); 
       const checkInMinute = Math.floor(Math.random() * 60);
-      const workHoursRaw = 7.5 + Math.random() * 2.5; // 7.5 - 10 hours
+      const workHoursRaw = 7.5 + Math.random() * 2.5; 
       const workHours = parseFloat(workHoursRaw.toFixed(2));
       const extraHours = parseFloat(Math.max(0, workHours - 8).toFixed(2));
 
@@ -120,7 +120,7 @@ async function main() {
   }
   console.log('✅ Seeded attendance data for last 5 days');
 
-  // ── Seed Leave Requests ──────────────────────────────────────────────────
+  
   const leaveData = [
     { userId: createdUsers[0].id, type: 'PAID' as const, startOffset: 7, endOffset: 11, days: 5, status: 'PENDING' as const },
     { userId: createdUsers[1].id, type: 'SICK' as const, startOffset: 1, endOffset: 2, days: 2, status: 'PENDING' as const },

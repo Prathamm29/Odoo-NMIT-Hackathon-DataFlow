@@ -23,7 +23,7 @@ export default function SignUpPage() {
       setError(result.error);
       setIsLoading(false);
     } else {
-      // The server action handles redirect to dashboard
+      
       router.push("/dashboard");
     }
   };
@@ -136,9 +136,9 @@ export default function SignUpPage() {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full bg-gray-900 text-white font-bold py-3 hover:bg-gray-800 disabled:opacity-70"
+          className="w-full bg-blue-600 text-white font-bold py-3 hover:bg-blue-700 disabled:opacity-70"
         >
-          {isLoading ? "Signing up..." : "Sign Up"}
+          {isLoading ? "Processing..." : "Set Password & Continue"}
         </button>
       </form>
 

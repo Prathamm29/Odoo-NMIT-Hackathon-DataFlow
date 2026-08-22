@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/session';
 import type { ActionResult, AddEmployeeResult, EmployeeDTO, EmployeeProfileDTO } from '@/lib/types';
 
-// ─── Helper: Generate a readable temporary password ──────────────────────────
+
 
 function generateTempPassword(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
@@ -41,7 +41,7 @@ async function generateEmployeeLoginId(companyId: string, companyCode: string, f
   return `${companyCode}${nameCode}${year}${serial}`;
 }
 
-// ─── Add Employee (Admin-only) ───────────────────────────────────────────────
+
 
 export async function addEmployee(formData: FormData): Promise<AddEmployeeResult> {
   const session = await getSession();
@@ -60,13 +60,13 @@ export async function addEmployee(formData: FormData): Promise<AddEmployeeResult
     return { success: false, error: 'First name, last name, and email are required.' };
   }
 
-  // Check for duplicate email
+  
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     return { success: false, error: 'An employee with this email already exists.' };
   }
 
-  // Fetch company code for loginId generation
+  
   const company = await prisma.company.findUnique({
     where: { id: session.companyId },
   });
@@ -107,7 +107,7 @@ export async function addEmployee(formData: FormData): Promise<AddEmployeeResult
   };
 }
 
-// ─── Get All Employees in Company ────────────────────────────────────────────
+
 
 export async function getEmployees(): Promise<ActionResult<EmployeeDTO[]>> {
   const session = await getSession();
@@ -139,7 +139,7 @@ export async function getEmployees(): Promise<ActionResult<EmployeeDTO[]>> {
   return { success: true, data: employees };
 }
 
-// ─── Get Single Employee Profile ─────────────────────────────────────────────
+
 
 export async function getEmployeeProfile(userId: string): Promise<ActionResult<EmployeeProfileDTO>> {
   const session = await getSession();
@@ -159,7 +159,7 @@ export async function getEmployeeProfile(userId: string): Promise<ActionResult<E
     return { success: false, error: 'Employee not found.' };
   }
 
-  // Employees can only view profiles within their company
+  
   if (user.companyId !== session.companyId) {
     return { success: false, error: 'Access denied.' };
   }

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/session';
 import type { ActionResult, LeaveRequestDTO } from '@/lib/types';
 
-// ─── Helper: Format leave request to DTO ─────────────────────────────────────
+
 
 function toLeaveDTO(
   record: {
@@ -34,7 +34,7 @@ function toLeaveDTO(
   };
 }
 
-// ─── Request Leave ───────────────────────────────────────────────────────────
+
 
 export async function requestLeave(formData: FormData): Promise<ActionResult> {
   const session = await getSession();
@@ -48,7 +48,7 @@ export async function requestLeave(formData: FormData): Promise<ActionResult> {
   const allocationDays = parseFloat(formData.get('allocationDays') as string);
   const remarks = (formData.get('remarks') as string) || null;
 
-  // ── Validation ───────────────────────────────────────────────────────────
+  
   if (!leaveType || !startDateStr || !endDateStr || !allocationDays) {
     return { success: false, error: 'All required fields must be filled.' };
   }
@@ -73,7 +73,7 @@ export async function requestLeave(formData: FormData): Promise<ActionResult> {
     return { success: false, error: 'Allocation days must be positive.' };
   }
 
-  // ── Create leave request ─────────────────────────────────────────────────
+  
   await prisma.leaveRequest.create({
     data: {
       userId: session.userId,
@@ -89,7 +89,7 @@ export async function requestLeave(formData: FormData): Promise<ActionResult> {
   return { success: true };
 }
 
-// ─── Get My Leaves (Employee view) ───────────────────────────────────────────
+
 
 export async function getMyLeaves(): Promise<ActionResult<LeaveRequestDTO[]>> {
   const session = await getSession();
@@ -108,7 +108,7 @@ export async function getMyLeaves(): Promise<ActionResult<LeaveRequestDTO[]>> {
   };
 }
 
-// ─── Get All Leave Requests (Admin view) ─────────────────────────────────────
+
 
 export async function getAllLeaveRequests(): Promise<ActionResult<LeaveRequestDTO[]>> {
   const session = await getSession();
@@ -141,7 +141,7 @@ export async function getAllLeaveRequests(): Promise<ActionResult<LeaveRequestDT
   };
 }
 
-// ─── Update Leave Status (Admin: Approve/Reject) ─────────────────────────────
+
 
 export async function updateLeaveStatus(
   requestId: string,
@@ -152,7 +152,7 @@ export async function updateLeaveStatus(
     return { success: false, error: 'Unauthorized. Admin access required.' };
   }
 
-  // Fetch the leave request
+  
   const leaveRequest = await prisma.leaveRequest.findUnique({
     where: { id: requestId },
     include: {
@@ -164,7 +164,7 @@ export async function updateLeaveStatus(
     return { success: false, error: 'Leave request not found.' };
   }
 
-  // Verify same company
+  
   if (leaveRequest.user.companyId !== session.companyId) {
     return { success: false, error: 'Access denied.' };
   }
@@ -173,13 +173,13 @@ export async function updateLeaveStatus(
     return { success: false, error: 'This request has already been processed.' };
   }
 
-  // Update the leave request status
+  
   await prisma.leaveRequest.update({
     where: { id: requestId },
     data: { status: newStatus },
   });
 
-  // If approved, create attendance records with LEAVE status for each day
+  
   if (newStatus === 'APPROVED') {
     const start = new Date(leaveRequest.startDate);
     const end = new Date(leaveRequest.endDate);
@@ -192,7 +192,7 @@ export async function updateLeaveStatus(
 
     const current = new Date(start);
     while (current <= end) {
-      // Skip weekends (0 = Sunday, 6 = Saturday)
+      
       const dayOfWeek = current.getUTCDay();
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {
         attendanceRecords.push({
@@ -204,7 +204,7 @@ export async function updateLeaveStatus(
       current.setUTCDate(current.getUTCDate() + 1);
     }
 
-    // Upsert attendance for each leave day (skip if already has a record)
+    
     for (const record of attendanceRecords) {
       await prisma.attendance.upsert({
         where: {

@@ -31,7 +31,7 @@ export default function SignInPage() {
       setNeedsReset(true);
       setIsLoading(false);
     } else {
-      // The server action already redirects, but if it doesn't:
+      
       router.push("/dashboard");
     }
   };
@@ -91,14 +91,14 @@ export default function SignInPage() {
               type="password" 
               name="confirmNewPassword"
               required 
-              className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" 
+              className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" 
             />
           </div>
   
           <button 
             type="submit" 
             disabled={isLoading}
-            className="w-full bg-gray-900 text-white font-bold py-3 hover:bg-gray-800 disabled:opacity-70"
+            className="w-full bg-blue-600 text-white font-bold py-3 hover:bg-blue-700 disabled:opacity-70"
           >
             {isLoading ? "Updating..." : "Set Password & Continue"}
           </button>
@@ -145,16 +145,16 @@ export default function SignInPage() {
             name="password"
             required 
             placeholder="••••••••"
-            className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" 
+            className="w-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" 
           />
         </div>
 
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full bg-gray-900 text-white font-bold py-3 hover:bg-gray-800 disabled:opacity-70"
+          className="w-full bg-blue-600 text-white font-bold py-3 hover:bg-blue-700 disabled:opacity-70"
         >
-          {isLoading ? "Signing in..." : "Sign In"}
+          {isLoading ? "Checking Credentials..." : "Log In"}
         </button>
       </form>
 

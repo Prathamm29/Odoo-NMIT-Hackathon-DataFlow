@@ -15,7 +15,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="space-y-6">
-      {/* Header Profile Card */}
+      {}
       <div className="bg-white border border-gray-300 p-6 flex flex-col md:flex-row gap-8">
         <div className="flex-shrink-0">
           <div className="w-32 h-32 bg-gray-200 border border-gray-300 flex items-center justify-center">

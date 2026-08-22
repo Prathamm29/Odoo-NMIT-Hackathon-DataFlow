@@ -23,10 +23,3 @@ body {
   color: var(--foreground);
 }
 
-/* Enforce Strict Anti-Patterns Globally */
-* {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  transition: none !important;
-  animation: none !important;
-}

@@ -51,13 +51,13 @@ export default function TimeOffEmployeeClient({
         
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center px-4 py-2 bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 focus:outline-none"
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-bold text-sm hover:bg-blue-600 focus:outline-none"
         >
           <PlusIcon className="w-5 h-5 mr-2" /> Request Time Off
         </button>
       </div>
 
-      {/* Summary Header */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-white border border-gray-300 p-6 flex flex-col items-center justify-center text-center">
           <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">Paid Time Off</span>
@@ -76,7 +76,7 @@ export default function TimeOffEmployeeClient({
         </div>
       </div>
 
-      {/* Leave History */}
+      {}
       <div className="bg-white border border-gray-300 overflow-x-auto">
         <h3 className="text-lg font-bold text-gray-900 m-6 mb-2 border-b border-gray-200 pb-2">Leave History</h3>
         <table className="min-w-full divide-y divide-gray-200">
@@ -116,9 +116,9 @@ export default function TimeOffEmployeeClient({
         </table>
       </div>
 
-      {/* Request Modal */}
+      {}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-500/20 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white w-full max-w-lg border border-gray-300 p-6 shadow-none">
             <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
               <h2 className="text-xl font-bold text-gray-900">New Time-Off Request</h2>
@@ -141,7 +141,7 @@ export default function TimeOffEmployeeClient({
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">Time-off Type</label>
-                <select name="leaveType" required className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900">
+                <select name="leaveType" required className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600">
                   <option value="PAID">Paid Time Off</option>
                   <option value="SICK">Sick Leave</option>
                   <option value="UNPAID">Unpaid Leave</option>
@@ -151,22 +151,22 @@ export default function TimeOffEmployeeClient({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">From</label>
-                  <input type="date" name="startDate" required className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                  <input type="date" name="startDate" required className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-1">To</label>
-                  <input type="date" name="endDate" required className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                  <input type="date" name="endDate" required className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600" />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">Allocation Days</label>
-                <input type="number" name="allocationDays" step="0.5" required placeholder="e.g. 2" className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                <input type="number" name="allocationDays" step="0.5" required placeholder="e.g. 2" className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600" />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">Remarks</label>
-                <input type="text" name="remarks" placeholder="Optional notes..." className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                <input type="text" name="remarks" placeholder="Optional notes..." className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600" />
               </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 mt-6">
@@ -180,7 +180,7 @@ export default function TimeOffEmployeeClient({
                 <button 
                   type="submit" 
                   disabled={isLoading}
-                  className="px-4 py-2 bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 disabled:opacity-70"
+                  className="px-4 py-2 bg-blue-600 text-white font-bold text-sm hover:bg-blue-600 disabled:opacity-70"
                 >
                   {isLoading ? "Submitting..." : "Submit Request"}
                 </button>

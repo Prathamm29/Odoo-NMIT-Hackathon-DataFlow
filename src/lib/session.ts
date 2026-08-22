@@ -4,12 +4,9 @@ import { cookies } from 'next/headers';
 import type { SessionPayload } from './types';
 
 const COOKIE_NAME = 'dayflow-session';
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; 
 
-/**
- * Creates a session cookie for the authenticated user.
- * Must be called from a Server Action or Route Handler.
- */
+
 export async function createSession(payload: SessionPayload): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, JSON.stringify(payload), {
@@ -21,10 +18,7 @@ export async function createSession(payload: SessionPayload): Promise<void> {
   });
 }
 
-/**
- * Reads and parses the session cookie.
- * Returns null if no session exists or the cookie is malformed.
- */
+
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
   const cookie = cookieStore.get(COOKIE_NAME);
@@ -35,7 +29,7 @@ export async function getSession(): Promise<SessionPayload | null> {
 
   try {
     const payload = JSON.parse(cookie.value) as SessionPayload;
-    // Basic shape validation
+    
     if (payload.userId && payload.role && payload.companyId) {
       return payload;
     }
@@ -45,10 +39,7 @@ export async function getSession(): Promise<SessionPayload | null> {
   }
 }
 
-/**
- * Destroys the session by deleting the cookie.
- * Must be called from a Server Action or Route Handler.
- */
+
 export async function destroySession(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);

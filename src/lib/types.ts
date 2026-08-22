@@ -1,8 +1,8 @@
-// ─── Shared Types & DTOs ─────────────────────────────────────────────────────
-// These types are used across server actions and client components.
-// They intentionally avoid exposing Prisma model types to the client.
 
-// ─── Generic Action Result ───────────────────────────────────────────────────
+
+
+
+
 
 export type ActionResult<T = void> = {
   success: true;
@@ -12,7 +12,7 @@ export type ActionResult<T = void> = {
   error: string;
 };
 
-// ─── Session ─────────────────────────────────────────────────────────────────
+
 
 export type SessionPayload = {
   userId: string;
@@ -20,14 +20,14 @@ export type SessionPayload = {
   companyId: string;
 };
 
-// ─── Auth ────────────────────────────────────────────────────────────────────
+
 
 export type SignInResult = ActionResult<{
   mustChangePassword: boolean;
   userId?: string;
 }>;
 
-// ─── Employee / Profile ──────────────────────────────────────────────────────
+
 
 export type EmployeeDTO = {
   id: string;
@@ -38,7 +38,7 @@ export type EmployeeDTO = {
   lastName: string;
   jobTitle: string | null;
   department: string | null;
-  dateOfJoining: string; // ISO string
+  dateOfJoining: string; 
   baseMonthlyWage: number;
 };
 
@@ -51,13 +51,13 @@ export type AddEmployeeResult = ActionResult<{
   temporaryPassword: string;
 }>;
 
-// ─── Attendance ──────────────────────────────────────────────────────────────
+
 
 export type AttendanceDTO = {
   id: string;
   userId: string;
-  employeeName?: string; // populated in admin view
-  date: string;          // ISO string
+  employeeName?: string; 
+  date: string;          
   checkIn: string | null;
   checkOut: string | null;
   workHours: number | null;
@@ -72,15 +72,15 @@ export type TodayStatusDTO = {
   attendanceId: string | null;
 };
 
-// ─── Leave ───────────────────────────────────────────────────────────────────
+
 
 export type LeaveRequestDTO = {
   id: string;
   userId: string;
-  employeeName?: string; // populated in admin view
+  employeeName?: string; 
   leaveType: 'PAID' | 'SICK' | 'UNPAID';
-  startDate: string;     // ISO string
-  endDate: string;       // ISO string
+  startDate: string;     
+  endDate: string;       
   allocationDays: number;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   attachmentUrl: string | null;

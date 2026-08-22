@@ -5,7 +5,7 @@ export default async function EmployeeAttendancePage() {
   const result = await getMyAttendance();
   const records = result.success && result.data ? result.data : [];
 
-  // Format date helper
+  
   const formatDate = (isoString: string) => {
     return new Date(isoString).toLocaleDateString("en-US", {
       year: "numeric", month: "short", day: "numeric"

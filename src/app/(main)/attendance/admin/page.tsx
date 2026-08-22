@@ -13,7 +13,7 @@ export default async function AdminAttendancePage({
   const result = await getAllAttendance(targetDate);
   const records = result.success && result.data ? result.data : [];
 
-  // Format date helper
+  
   const formatDate = (isoString: string) => {
     return new Date(isoString).toLocaleDateString("en-US", {
       year: "numeric", month: "short", day: "numeric"

@@ -4,18 +4,18 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/session';
 import type { ActionResult, AttendanceDTO, TodayStatusDTO } from '@/lib/types';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+
 
 const STANDARD_WORK_HOURS = 8;
 
-// ─── Helper: Get today's date at midnight (UTC) ──────────────────────────────
+
 
 function getTodayDate(): Date {
   const now = new Date();
   return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
 }
 
-// ─── Helper: Format attendance record to DTO ─────────────────────────────────
+
 
 function toAttendanceDTO(
   record: {
@@ -43,7 +43,7 @@ function toAttendanceDTO(
   };
 }
 
-// ─── Check In ────────────────────────────────────────────────────────────────
+
 
 export async function checkIn(): Promise<ActionResult<AttendanceDTO>> {
   const session = await getSession();
@@ -54,7 +54,7 @@ export async function checkIn(): Promise<ActionResult<AttendanceDTO>> {
   const today = getTodayDate();
   const now = new Date();
 
-  // Upsert: create if not exists, or update checkIn if checking in again
+  
   const attendance = await prisma.attendance.upsert({
     where: {
       userId_date: {
@@ -80,7 +80,7 @@ export async function checkIn(): Promise<ActionResult<AttendanceDTO>> {
   return { success: true, data: toAttendanceDTO(attendance) };
 }
 
-// ─── Check Out ───────────────────────────────────────────────────────────────
+
 
 export async function checkOut(): Promise<ActionResult<AttendanceDTO>> {
   const session = await getSession();
@@ -91,7 +91,7 @@ export async function checkOut(): Promise<ActionResult<AttendanceDTO>> {
   const today = getTodayDate();
   const now = new Date();
 
-  // Find today's attendance
+  
   const attendance = await prisma.attendance.findUnique({
     where: {
       userId_date: {
@@ -109,12 +109,12 @@ export async function checkOut(): Promise<ActionResult<AttendanceDTO>> {
     return { success: false, error: 'No check-in found for today.' };
   }
 
-  // Calculate work hours and extra hours
+  
   const diffMs = now.getTime() - attendance.checkIn.getTime();
   const workHours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
   const extraHours = parseFloat(Math.max(0, workHours - STANDARD_WORK_HOURS).toFixed(2));
 
-  // Determine status based on hours worked
+  
   let status: 'PRESENT' | 'HALF_DAY' = 'PRESENT';
   if (workHours < STANDARD_WORK_HOURS / 2) {
     status = 'HALF_DAY';
@@ -133,7 +133,7 @@ export async function checkOut(): Promise<ActionResult<AttendanceDTO>> {
   return { success: true, data: toAttendanceDTO(updated) };
 }
 
-// ─── Get Today's Status (for TopBar) ─────────────────────────────────────────
+
 
 export async function getTodayStatus(): Promise<ActionResult<TodayStatusDTO>> {
   const session = await getSession();
@@ -175,7 +175,7 @@ export async function getTodayStatus(): Promise<ActionResult<TodayStatusDTO>> {
   };
 }
 
-// ─── Get My Attendance (Employee view) ───────────────────────────────────────
+
 
 export async function getMyAttendance(
   month?: number,
@@ -187,11 +187,11 @@ export async function getMyAttendance(
   }
 
   const now = new Date();
-  const targetMonth = month ?? now.getMonth(); // 0-indexed
+  const targetMonth = month ?? now.getMonth(); 
   const targetYear = year ?? now.getFullYear();
 
   const startDate = new Date(Date.UTC(targetYear, targetMonth, 1));
-  const endDate = new Date(Date.UTC(targetYear, targetMonth + 1, 0)); // Last day of month
+  const endDate = new Date(Date.UTC(targetYear, targetMonth + 1, 0)); 
 
   const records = await prisma.attendance.findMany({
     where: {
@@ -210,7 +210,7 @@ export async function getMyAttendance(
   };
 }
 
-// ─── Get All Attendance (Admin view) ─────────────────────────────────────────
+
 
 export async function getAllAttendance(
   dateStr?: string
@@ -220,7 +220,7 @@ export async function getAllAttendance(
     return { success: false, error: 'Unauthorized. Admin access required.' };
   }
 
-  // Default to today
+  
   const targetDate = dateStr ? new Date(dateStr) : getTodayDate();
 
   const records = await prisma.attendance.findMany({
