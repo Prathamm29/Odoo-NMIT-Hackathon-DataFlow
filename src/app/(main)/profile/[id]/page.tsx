@@ -3,8 +3,9 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import ProfileTabs from "@/components/profile/ProfileTabs";
 import { notFound } from "next/navigation";
 
-export default async function ProfilePage({ params }: { params: { id: string } }) {
-  const result = await getEmployeeProfile(params.id);
+export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const result = await getEmployeeProfile(resolvedParams.id);
 
   if (!result.success || !result.data) {
     return notFound();
